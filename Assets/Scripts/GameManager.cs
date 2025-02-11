@@ -94,39 +94,55 @@ public class GameManager : MonoBehaviour
         //printGrid(verticalLines);
 
         // if box is completed
-        int box = boxComplete(numRows - 1 - row, col, isHorizontal);
-        UnityEngine.Debug.Log("box return " + box);
-        if (box != 0)
+        bool[] directions = boxComplete(numRows - 1 - row, col, isHorizontal);
+        if (directions[0] || directions[1] || directions[2] || directions[3])
         {
             float dotX = (float)(col * spacing - spacing * (numCols / 2 - 0.5));
-            float dotY = (float)(row * spacing - spacing * (numRows / 2 - 0.5));
-
-            // assign box to player
-            GameObject textObj = Instantiate(playerNamePrefab, canvasTransform);
-            TextMeshProUGUI playerText = textObj.GetComponent<TextMeshProUGUI>();
-            RectTransform textRect = textObj.GetComponent<RectTransform>();
-            textRect.sizeDelta = new Vector2(spacing, spacing);
-            playerText.text = (currentPlayer == 1) ? player1 : player2;
+            float dotY = (float)(row * spacing - spacing * (numRows / 2 - 0.5));           
 
             // top
-            if (box == 1)
+            if (directions[0])
             {
+                UnityEngine.Debug.Log("top box");
+                GameObject textObj = Instantiate(playerNamePrefab, canvasTransform);
+                TextMeshProUGUI playerText = textObj.GetComponent<TextMeshProUGUI>();
+                RectTransform textRect = textObj.GetComponent<RectTransform>();
+                textRect.sizeDelta = new Vector2(spacing, spacing);
+                playerText.text = (currentPlayer == 1) ? player1 : player2;
                 playerText.transform.localPosition = new Vector3(dotX + spacing/2, dotY + spacing / 2, 0);
             }
             // bottom
-            else if (box == 2)
+            if (directions[1])
             {
+                UnityEngine.Debug.Log("bottom box");
+                GameObject textObj = Instantiate(playerNamePrefab, canvasTransform);
+                TextMeshProUGUI playerText = textObj.GetComponent<TextMeshProUGUI>();
+                RectTransform textRect = textObj.GetComponent<RectTransform>();
+                textRect.sizeDelta = new Vector2(spacing, spacing);
+                playerText.text = (currentPlayer == 1) ? player1 : player2;
                 playerText.transform.localPosition = new Vector3(dotX + spacing / 2, dotY - spacing / 2, 0);
             }
             // left
-            else if (box == 3)
+            if (directions[2])
             {
+                UnityEngine.Debug.Log("left box");
+                GameObject textObj = Instantiate(playerNamePrefab, canvasTransform);
+                TextMeshProUGUI playerText = textObj.GetComponent<TextMeshProUGUI>();
+                RectTransform textRect = textObj.GetComponent<RectTransform>();
+                textRect.sizeDelta = new Vector2(spacing, spacing);
+                playerText.text = (currentPlayer == 1) ? player1 : player2;
                 playerText.transform.localPosition = new Vector3(dotX - spacing / 2, dotY + spacing / 2, 0);
             }
             // right
-            else
+            if (directions[3])
             {
-                playerText.transform.localPosition = new Vector3(dotX - spacing / 2, dotY - spacing / 2, 0);
+                UnityEngine.Debug.Log("right box");
+                GameObject textObj = Instantiate(playerNamePrefab, canvasTransform);
+                TextMeshProUGUI playerText = textObj.GetComponent<TextMeshProUGUI>();
+                RectTransform textRect = textObj.GetComponent<RectTransform>();
+                textRect.sizeDelta = new Vector2(spacing, spacing);
+                playerText.text = (currentPlayer == 1) ? player1 : player2;
+                playerText.transform.localPosition = new Vector3(dotX + spacing / 2, dotY + spacing / 2, 0);
             }
             
         }
@@ -137,26 +153,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    int boxComplete(int row, int col, bool isHorizontal)
+    bool[] boxComplete(int row, int col, bool isHorizontal)
     {
+        bool[] directions = new bool[4];
+       
         if(isHorizontal)
         {
             // check top box if any
-            if (row != 0 && horizontalLines[row - 1, col] && verticalLines[row - 1, col] && verticalLines[row - 1, col + 1]) return 1;
+            if (row != 0 && horizontalLines[row - 1, col] && verticalLines[row - 1, col] && verticalLines[row - 1, col + 1])  directions[0] = true;
 
             // check bottom box if any
-            if (row != numRows - 1 && horizontalLines[row + 1, col] && verticalLines[row, col] && verticalLines[row, col + 1]) return 2;
+            if (row != numRows - 1 && horizontalLines[row + 1, col] && verticalLines[row, col] && verticalLines[row, col + 1]) directions[1] = true;
         }
         else
         {
             // check left box if any
-            if (col != 0 && verticalLines[row - 1, col - 1] && horizontalLines[row, col - 1] && horizontalLines[row - 1, col - 1]) return 3;
+            if (col != 0 && verticalLines[row - 1, col - 1] && horizontalLines[row, col - 1] && horizontalLines[row - 1, col - 1]) directions[2] = true;
 
             // check right box if any
-            if (col != numCols - 1 && verticalLines[row - 1, col + 1] && horizontalLines[row, col] && horizontalLines[row - 1, col]) return 4;
+            if (col != numCols - 1 && verticalLines[row - 1, col + 1] && horizontalLines[row, col] && horizontalLines[row - 1, col]) directions[3] = true;
         }
 
-        return 0;
+        return directions;
     }
 
     void printGrid(bool[,] grid)
