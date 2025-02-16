@@ -24,6 +24,14 @@ public class GameManager : MonoBehaviour
     public GameObject dot;
     public GameObject line;
     public Transform canvasTransform;
+    public TextMeshProUGUI player1ScoreText;
+    public TextMeshProUGUI player2ScoreText;
+    public TextMeshProUGUI winner;
+    private int player1Score = 0;
+    private int player2Score = 0;
+    private int count = 0;
+    private int prev_count = 0;
+
 
     HashSet<Vector2Int> selectedNodes = new HashSet<Vector2Int>();
 
@@ -210,11 +218,21 @@ public class GameManager : MonoBehaviour
                 if (!moved)
                 {
                     UnityEngine.Debug.Log("No valid move for node at: " + newRow + ", " + newCol);
+                    count++;
+                    if (count > prev_count) // Ensures score updates only when a new circle is trapped
+                    {
+                        UpdateScore(currentPlayer);
+                        // prev_count = count;
+                    }
                     break;
                 }
+                prev_count = count;
+                // UpdateScore(currentPlayer);
             }            
-
+            // UpdateScore(currentPlayer);
             newSelectedNodes.Add(new Vector2Int(newRow, newCol));
+            // UpdateScore(currentPlayer);
+
         }
 
         // Replace old nodes with new nodes
@@ -324,7 +342,28 @@ public class GameManager : MonoBehaviour
             CreateCircleAtNode(node.x, node.y);
         }
     }
+    void UpdateScore(int player)
+    {
+        if(player1Score<=2 && player2Score<=2){
+            if (player == 1)
+            {
 
+                player1Score+=1;
+                player1ScoreText.text = $"{player1}: {player1Score}";
+            }
+            else
+            {
+                player2Score+=1;
+                player2ScoreText.text = $"{player2}: {player2Score}";
+            }
+        }else{
+            // winner.text = (player1Score > 2 ) ? $"PLAYER {player1} WINS!!" : $"PLAYER {player2} WINS!!";
+            if(player1Score>=2){
+                winner.text = $"PLAYER {player1} WINS!!";
+            }else if(player2Score>=2){
+                winner.text = $"PLAYER {player2} WINS!!";
+            }    
+        }
+    }
+    }
 
-
-}
