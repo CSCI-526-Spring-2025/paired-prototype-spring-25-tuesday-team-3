@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     private bool[,] horizontalLines;
     private bool[,] verticalLines;
     
-    public GameObject playerNamePrefab;
+    // public GameObject playerNamePrefab;
     public GameObject dot;
     public GameObject line;
     public Transform canvasTransform;
@@ -30,8 +30,10 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI player;
     private int player1Score = 0;
     private int player2Score = 0;
-    private int count = 0;
-    private int prev_count = 0;
+    private int enclosedCount;
+    // private int count = 0;
+    // private int prev_count = 0;
+    private HashSet<Vector2Int> enclosedCircles = new HashSet<Vector2Int>();
 
 
     HashSet<Vector2Int> selectedNodes = new HashSet<Vector2Int>();
@@ -165,6 +167,7 @@ public class GameManager : MonoBehaviour
         // {
             
         // }
+        // UpdateScore(currentPlayer);
         generateCirclePositions();
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
     }
@@ -219,21 +222,12 @@ public class GameManager : MonoBehaviour
                 // If all four directions are blocked, exit the loop without moving
                 if (!moved)
                 {
+                    UpdateScore(currentPlayer, newRow, newCol);
                     UnityEngine.Debug.Log("No valid move for node at: " + newRow + ", " + newCol);
-                    count++;
-                    if (count > prev_count) // Ensures score updates only when a new circle is trapped
-                    {
-                        UpdateScore(currentPlayer);
-                        // prev_count = count;
-                    }
                     break;
                 }
-                prev_count = count;
-                // UpdateScore(currentPlayer);
             }            
-            // UpdateScore(currentPlayer);
             newSelectedNodes.Add(new Vector2Int(newRow, newCol));
-            // UpdateScore(currentPlayer);
 
         }
 
@@ -344,12 +338,39 @@ public class GameManager : MonoBehaviour
             CreateCircleAtNode(node.x, node.y);
         }
     }
-    void UpdateScore(int player)
-    {
-        if(player1Score<=2 && player2Score<=2){
-            if (player == 1)
-            {
+    // void UpdateScore(int player)
+    // {
+    //     // List<int> moveOrder = new List<int> { 0, 1, 2, 3 };
+    //     bool moved = false;
+    //     if(player1Score<=2 && player2Score<=2){
+    //         if (player == 1 && moved != true)
+    //         {
 
+    //             player1Score+=1;
+    //             player1ScoreText.text = $"{player1}: {player1Score}";
+    //         }
+    //         else if(player ==2 && moved != true)
+    //         {
+    //             player2Score+=1;
+    //             player2ScoreText.text = $"{player2}: {player2Score}";
+    //         }
+    //     }else{
+    //         // winner.text = (player1Score > 2 ) ? $"PLAYER {player1} WINS!!" : $"PLAYER {player2} WINS!!";
+    //         if(player1Score>=2){
+    //             winner.text = $"PLAYER {player1} WINS!!";
+    //         }else if(player2Score>=2){
+    //             winner.text = $"PLAYER {player2} WINS!!";
+    //         }    
+    //     }
+    // }
+    void UpdateScore( int player, int newRow, int newCol)
+    {
+        enclosedCircles.Add(new Vector2Int(newRow, newCol));
+        if(enclosedCircles.Count != enclosedCount){
+            enclosedCount = enclosedCircles.Count;
+            UnityEngine.Debug.Log("Player " + player + " previous scores" + player1Score + " " + player2Score);
+            if(player == 1)
+            {
                 player1Score+=1;
                 player1ScoreText.text = $"{player1}: {player1Score}";
             }
@@ -358,13 +379,10 @@ public class GameManager : MonoBehaviour
                 player2Score+=1;
                 player2ScoreText.text = $"{player2}: {player2Score}";
             }
-        }else{
-            // winner.text = (player1Score > 2 ) ? $"PLAYER {player1} WINS!!" : $"PLAYER {player2} WINS!!";
-            if(player1Score>=2){
-                winner.text = $"PLAYER {player1} WINS!!";
-            }else if(player2Score>=2){
-                winner.text = $"PLAYER {player2} WINS!!";
-            }    
+            UnityEngine.Debug.Log("Player " + player + "updated scores"+ player1Score + " " + player2Score);
+            if(player1Score>= 2 || player2Score>= 2){
+                winner.text = (player1Score >= 2) ? $"PLAYER {player1} WINS!!" : $"PLAYER {player2} WINS!!";
+            }   
         }
     }
     }
